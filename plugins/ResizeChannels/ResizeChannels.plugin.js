@@ -14,7 +14,7 @@
             "discord_id": "455031571930546177",
             "github_username": "PhilipFV"
         }],
-        "version": "0.1.4",
+        "version": "0.1.5",
         "description": "Resize channel list by clicking and draging and toggle hide with double click.",
         "github_raw": "https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js"
     },
@@ -43,28 +43,14 @@ module.exports = !global.ZeresPluginLibrary ? class {
 } : (([Plugin, Library]) => {
     const customCSS = `
     .ResizableChannels-Slider-Handle {
-        position: absolute;
-        margin-left: 240px;
-        height: 100%;
-        border-left: solid 4px transparent;
-        transition-property: border-color;
-        transition-duration: 250ms;
-        transition-delay: 0ms;
-        width: 8px;
         cursor: ew-resize;
-        z-index: 1000;
+        z-index: 1001
     }
-    
-    .ResizableChannels-Slider-Handle:hover {
-        transition-delay: 200ms;
-        border-color: var(--brand-experiment-560);
+
+    .sidebar-1tnWFu{
+        border-radius: 0px 8px 8px 0px; 
     }
-    
-    .ResizableChannels-Slider-Handle:active {
-        transition-delay: 0ms;
-        border-color: var(--brand-experiment);
-    }
-    
+
     .channel-1Shao0 {
         max-width: none;
     }
@@ -74,14 +60,24 @@ module.exports = !global.ZeresPluginLibrary ? class {
     }`;
 
     function GetResizeObjects() {
+        // inline because closing/opening thread clears class list
+        const containerChat = document.getElementsByClassName("chat-2ZfjoI")[0];
+        const containerChatHome = document.getElementsByClassName("container-2cd8Mz")[0];
+        if (containerChat) containerChat.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
+        if (containerChatHome) containerChatHome.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
+
         const channelList = document.getElementsByClassName("sidebar-1tnWFu")[0];
         if (document.getElementsByClassName("ResizableChannels-Slider-Handle").length == 0) addReziseHandleRight(channelList);
     }
 
     function addReziseHandleRight(target) {
         var handle = document.createElement("div");
+        const containerChat = document.getElementsByClassName("container-2cd8Mz")[0];
+        const containerChatHome = document.getElementsByClassName("chat-2ZfjoI")[0];
         handle.classList.add("ResizableChannels-Slider-Handle");
-        target.appendChild(handle);
+        handle.classList.add("resizeHandle-PBRzPC");
+        // target.appendChild(handle);
+        target.after(handle);
         var offset = 0;
         handle.addEventListener("mousedown", (e) => {
             offset = e.clientX - e.target.getBoundingClientRect().x;
@@ -92,10 +88,17 @@ module.exports = !global.ZeresPluginLibrary ? class {
 
         function toggleVisibility(e) {
             var newWidth = 0;
-            if (target.style.width == "0px") newWidth = 240;
+            if (target.style.width == "0px")
+            {
+                handle.style.cursor = "w-resize"
+                newWidth = 240;
+                AddStyle();
+            } else {
+                handle.style.cursor = "e-resize"
+                handle.style.marginRight = "-8px";
+                RemoveStyle();
+            }
             target.style.width = `${newWidth}px`;
-            handle.style.marginLeft = `${newWidth}px`;
-            document.removeEventListener("mousemove", resize, true);
         }
 
         function resize(e) {
@@ -104,13 +107,30 @@ module.exports = !global.ZeresPluginLibrary ? class {
                 document.removeEventListener("mousemove", resize, true);
                 return;
             }
-            var width = Math.min(Math.max(e.clientX - target.getBoundingClientRect().left, 0), 500) - offset;
-            if (width <= 10) width = 0;
+            var width = Math.min(Math.max(e.clientX - target.getBoundingClientRect().left - offset, 0), 400);
+            if (width <= 10) {
+                width = 0; handle.style.marginRight = "-8px";
+                RemoveStyle()
+            }
+            else {
+                handle.style.marginRight = "0";
+                AddStyle()
+            }
             target.style.width = `${width}px`;
-            handle.style.marginLeft = `${width}px`;
             if (width == 0) handle.style.cursor = "e-resize"
-            else if (width == 500) handle.style.cursor = "w-resize"
+            else if (width == 400) handle.style.cursor = "w-resize"
             else handle.style.cursor = "ew-resize"
+        }
+
+        function RemoveStyle() {
+            if (containerChat) containerChat.style = "border-top-left-radius: 0px; border-bottom-left-radius: 0px;";
+            if (containerChatHome) containerChatHome.style = "border-top-left-radius: 0px; border-bottom-left-radius: 0px;";
+        }
+
+        function AddStyle() {
+            handle.style.marginRight = "0px";
+            if (containerChat) containerChat.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
+            if (containerChatHome) containerChatHome.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
         }
     }
 
@@ -124,6 +144,10 @@ module.exports = !global.ZeresPluginLibrary ? class {
         };
         onStop() {
             BdApi.clearCSS(config.info.name);
+            const containerChat = document.getElementsByClassName("container-2cd8Mz")[0];
+            if(containerChat) containerChat.style = null;
+            const containerChatHome = document.getElementsByClassName("chat-2ZfjoI")[0];
+            if(containerChatHome) containerChatHome.style = null;
             const handles = document.getElementsByClassName("ResizableChannels-Slider-Handle");
             for (const h of handles) { h.parentNode.removeChild(h) };
             const channelList = document.getElementsByClassName("sidebar-1tnWFu");
