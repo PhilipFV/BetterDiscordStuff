@@ -14,7 +14,7 @@
             "discord_id": "455031571930546177",
             "github_username": "PhilipFV"
         }],
-        "version": "0.1.6",
+        "version": "0.1.7",
         "description": "Resize channel list by clicking and draging and toggle hide with double click.",
         "github_raw": "https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js"
     },
@@ -44,7 +44,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
     const customCSS = `
     .ResizableChannels-Slider-Handle {
         cursor: ew-resize;
-        z-index: 1001
+        z-index: 1001;
     }
 
     .sidebar-1tnWFu{
@@ -72,8 +72,6 @@ module.exports = !global.ZeresPluginLibrary ? class {
 
     function addReziseHandleRight(target) {
         var handle = document.createElement("div");
-        const containerChat = document.getElementsByClassName("container-2cd8Mz")[0];
-        const containerChatHome = document.getElementsByClassName("chat-2ZfjoI")[0];
         handle.classList.add("ResizableChannels-Slider-Handle");
         handle.classList.add("resizeHandle-PBRzPC");
         // target.appendChild(handle);
@@ -123,11 +121,15 @@ module.exports = !global.ZeresPluginLibrary ? class {
         }
 
         function RemoveStyle() {
-            if (containerChat) containerChat.style = "border-top-left-radius: 0px; border-bottom-left-radius: 0px;";
-            if (containerChatHome) containerChatHome.style = "border-top-left-radius: 0px; border-bottom-left-radius: 0px;";
+            const containerChat = document.getElementsByClassName("container-2cd8Mz")[0];
+            const containerChatHome = document.getElementsByClassName("chat-2ZfjoI")[0];
+            if (containerChat) containerChat.removeAttribute("style");
+            if (containerChatHome) containerChatHome.removeAttribute("style");
         }
 
         function AddStyle() {
+            const containerChat = document.getElementsByClassName("container-2cd8Mz")[0];
+            const containerChatHome = document.getElementsByClassName("chat-2ZfjoI")[0];
             handle.style.marginRight = "0px";
             if (containerChat) containerChat.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
             if (containerChatHome) containerChatHome.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
@@ -145,9 +147,9 @@ module.exports = !global.ZeresPluginLibrary ? class {
         onStop() {
             BdApi.clearCSS(config.info.name);
             const containerChat = document.getElementsByClassName("container-2cd8Mz")[0];
-            if(containerChat) containerChat.style = null;
+            if(containerChat) containerChat.removeAttribute("style");
             const containerChatHome = document.getElementsByClassName("chat-2ZfjoI")[0];
-            if(containerChatHome) containerChatHome.style = null;
+            if(containerChatHome) containerChatHome.removeAttribute("style");
             const handles = document.getElementsByClassName("ResizableChannels-Slider-Handle");
             for (const h of handles) { h.parentNode.removeChild(h) };
             const channelList = document.getElementsByClassName("sidebar-1tnWFu");
