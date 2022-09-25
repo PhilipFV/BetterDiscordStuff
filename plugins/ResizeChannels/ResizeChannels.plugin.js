@@ -14,7 +14,7 @@
             "discord_id": "455031571930546177",
             "github_username": "PhilipFV"
         }],
-        "version": "0.1.7",
+        "version": "0.1.8",
         "description": "Resize channel list by clicking and draging and toggle hide with double click.",
         "github_raw": "https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js"
     },
@@ -48,16 +48,42 @@ module.exports = !global.ZeresPluginLibrary ? class {
     }
 
     .sidebar-1tnWFu{
-        border-radius: 0px 8px 8px 0px; 
+        border-radius: 8px 8px 8px 0px !important;
     }
 
     .channel-1Shao0 {
         max-width: none;
     }
+
+    .container-YkUktl .flex-2S1XBF {
+        background-color: var(--background-secondary-alt);
+        z-index: 0;
+    }
+
+    .avatarWrapper-1B9FTW {
+        margin-right: auto;
+    }
+
+    .withTagAsButton-OsgQ9L {
+        min-width: 0;
+    }
     
     .bannerImg-2PzH6z, .bannerImage-ubW8K- {
         width: 100%;
     }`;
+
+    //Settings and imports
+	const { Settings } = { ...Library, ...BdApi };
+	const { SettingPanel, SettingGroup, Textbox } = Settings;
+
+	//default settings
+	const defaultSettings = {
+        defaultWidth: 240,
+        maxWidth: 674,
+        minWidth: 112,
+	};
+
+    var settings = defaultSettings;
 
     function GetResizeObjects() {
         // inline because closing/opening thread clears class list
@@ -71,6 +97,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
     }
 
     function addReziseHandleRight(target) {
+        target.style.width = `${settings.defaultWidth}px`;
         var handle = document.createElement("div");
         handle.classList.add("ResizableChannels-Slider-Handle");
         handle.classList.add("resizeHandle-PBRzPC");
@@ -86,10 +113,10 @@ module.exports = !global.ZeresPluginLibrary ? class {
 
         function toggleVisibility(e) {
             var newWidth = 0;
-            if (target.style.width == "0px")
+            if (target.style.width === "0px")
             {
                 handle.style.cursor = "ew-resize"
-                newWidth = 240;
+                newWidth = settings.defaultWidth;
                 AddStyle();
             } else {
                 handle.style.cursor = "e-resize"
@@ -105,10 +132,18 @@ module.exports = !global.ZeresPluginLibrary ? class {
                 document.removeEventListener("mousemove", resize, true);
                 return;
             }
-            var width = Math.min(Math.max(e.clientX - target.getBoundingClientRect().left - offset, 0), 400);
-            if (width <= 10) {
-                width = 0; handle.style.marginRight = "-8px";
-                RemoveStyle()
+            var potentialWidth = e.clientX - target.getBoundingClientRect().left - offset;
+            var width = Math.min(Math.max(potentialWidth, settings.minWidth), settings.maxWidth);
+            console.log({potentialWidth, width})
+            if (width <= settings.minWidth) {
+                if (potentialWidth <= settings.minWidth * 0.1){ // 10% of max width
+                    width = 0;
+                    handle.style.marginRight = "-8px";
+                    RemoveStyle();
+                } else {
+                    handle.style.marginRight = "0";
+                    width = settings.minWidth;
+                }
             }
             else {
                 handle.style.marginRight = "0";
@@ -116,7 +151,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
             }
             target.style.width = `${width}px`;
             if (width == 0) handle.style.cursor = "e-resize"
-            else if (width == 400) handle.style.cursor = "w-resize"
+            else if (width == settings.maxWidth) handle.style.cursor = "w-resize"
             else handle.style.cursor = "ew-resize"
         }
 
@@ -124,7 +159,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
             const containerChat = document.getElementsByClassName("container-2cd8Mz")[0];
             const containerChatHome = document.getElementsByClassName("chat-2ZfjoI")[0];
             if (containerChat) containerChat.removeAttribute("style");
-            if (containerChatHome) containerChatHome.removeAttribute("style");
+            if (containerChatHome) containerChatHome.style = "border-top-left-radius: 8px;";
         }
 
         function AddStyle() {
@@ -138,9 +173,39 @@ module.exports = !global.ZeresPluginLibrary ? class {
 
     return class template extends Plugin {
         onStart() {
+            //load default settings
+			settings = this.loadSettings(defaultSettings);
+
             BdApi.injectCSS(config.info.name, customCSS);
             GetResizeObjects();
         }
+        getSettingsPanel() {
+			//build the settings pannel
+            var testButton = document.createElement("button");
+            testButton.classList = "button-f2h6uQ lookFilled-yCfaCM colorBrand-I6CyqQ sizeMedium-2bFIHr";
+            testButton.style = "width: 100%"
+            testButton.innerText = "Reset Settings"
+            testButton.addEventListener("click", () => {
+                settings = defaultSettings;
+                this.saveSettings(settings);
+                const settingsValues = settingsPannel.getElementsByClassName("inputDefault-3FGxgL");
+                for(var e in settingsValues) settingsValues[e].value = settings[Object.keys(settings)[e]]
+            });
+
+            const settingsPannel = SettingPanel.build(() => this.saveSettings(settings),
+                new Textbox("Default Width", "", settings.defaultWidth, (i) => {
+                    settings.defaultWidth = i.replace(/[^0-9]/g, '');
+                }),
+                new Textbox("Maximum Width", "", settings.maxWidth, (i) => {
+                    settings.maxWidth = i.replace(/[^0-9]/g, '');
+                }),
+                new Textbox("Minimum Width", "This option is intended to fix custom themes.", settings.minWidth, (i) => {
+                    settings.minWidth = i.replace(/[^0-9]/g, '');
+                }),
+                testButton,
+            );
+			return  settingsPannel;
+		}
         onSwitch() {
             GetResizeObjects();
         };
@@ -153,7 +218,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
             const handles = document.getElementsByClassName("ResizableChannels-Slider-Handle");
             for (const h of handles) { h.parentNode.removeChild(h) };
             const channelList = document.getElementsByClassName("sidebar-1tnWFu");
-            for (const r of channelList) r.style.width = `240px`;
+            for (const r of channelList) r.style.width = `${settings.defaultWidth}px`;
         }
     }
 })(global.ZeresPluginLibrary.buildPlugin(config));
