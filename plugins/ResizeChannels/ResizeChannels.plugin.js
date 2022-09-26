@@ -4,7 +4,7 @@
  * @website https://github.philipv.tech/
  * @source https://github.com/PhilipFV/BetterDiscordStuff/
  * @updateUrl https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js
- * @version 0.1.8
+ * @version 0.1.9
  */
 
  const config = {
@@ -15,7 +15,7 @@
             "discord_id": "455031571930546177",
             "github_username": "PhilipFV"
         }],
-        "version": "0.1.8",
+        "version": "0.1.9",
         "description": "Resize channel list by clicking and draging and toggle hide with double click.",
         "github_raw": "https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js"
     },
@@ -89,9 +89,9 @@ module.exports = !global.ZeresPluginLibrary ? class {
     function GetResizeObjects() {
         // inline because closing/opening thread clears class list
         const containerChat = document.getElementsByClassName("chat-2ZfjoI")[0];
-        const containerChatHome = document.getElementsByClassName("container-2cd8Mz")[0];
+        const containerChannels = document.getElementsByClassName("container-2cd8Mz")[0];
         if (containerChat) containerChat.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
-        if (containerChatHome) containerChatHome.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
+        if (containerChannels) containerChannels.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
 
         const channelList = document.getElementsByClassName("sidebar-1tnWFu")[0];
         if (document.getElementsByClassName("ResizableChannels-Slider-Handle").length == 0) addReziseHandleRight(channelList);
@@ -135,7 +135,6 @@ module.exports = !global.ZeresPluginLibrary ? class {
             }
             var potentialWidth = e.clientX - target.getBoundingClientRect().left - offset;
             var width = Math.min(Math.max(potentialWidth, settings.minWidth), settings.maxWidth);
-            console.log({potentialWidth, width})
             if (width <= settings.minWidth) {
                 if (potentialWidth <= settings.minWidth * 0.1){ // 10% of max width
                     width = 0;
@@ -144,6 +143,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
                 } else {
                     handle.style.marginRight = "0";
                     width = settings.minWidth;
+                    AddStyle();
                 }
             }
             else {
@@ -156,19 +156,26 @@ module.exports = !global.ZeresPluginLibrary ? class {
             else handle.style.cursor = "ew-resize"
         }
 
+        var style = true;
+        var containerChat, containerChannels;
+
         function RemoveStyle() {
-            const containerChat = document.getElementsByClassName("container-2cd8Mz")[0];
-            const containerChatHome = document.getElementsByClassName("chat-2ZfjoI")[0];
-            if (containerChat) containerChat.removeAttribute("style");
-            if (containerChatHome) containerChatHome.style = "border-top-left-radius: 8px;";
+            if (!style) return;
+            style = false;
+            if(!containerChat) containerChat = document.getElementsByClassName("container-2cd8Mz")[0];
+            if(!containerChannels) containerChannels = document.getElementsByClassName("chat-2ZfjoI")[0];
+            if (containerChat) containerChat.style = "border-top-left-radius: 8px !important;";
+            if (containerChannels) containerChannels.removeAttribute("style");
         }
 
         function AddStyle() {
-            const containerChat = document.getElementsByClassName("container-2cd8Mz")[0];
-            const containerChatHome = document.getElementsByClassName("chat-2ZfjoI")[0];
+            if(style) return;
+            style = true;
+            if(!containerChat) containerChat = document.getElementsByClassName("container-2cd8Mz")[0];
+            if(!containerChannels) containerChannels = document.getElementsByClassName("chat-2ZfjoI")[0];
             handle.style.marginRight = "0px";
             if (containerChat) containerChat.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
-            if (containerChatHome) containerChatHome.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
+            if (containerChannels) containerChannels.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
         }
     }
 
