@@ -4,7 +4,7 @@
  * @website https://github.philipv.tech/
  * @source https://github.com/PhilipFV/BetterDiscordStuff/
  * @updateUrl https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js
- * @version 0.1.9
+ * @version 0.1.10
  */
 
  const config = {
@@ -15,7 +15,7 @@
             "discord_id": "455031571930546177",
             "github_username": "PhilipFV"
         }],
-        "version": "0.1.9",
+        "version": "0.1.10",
         "description": "Resize channel list by clicking and draging and toggle hide with double click.",
         "github_raw": "https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js"
     },
@@ -71,7 +71,14 @@ module.exports = !global.ZeresPluginLibrary ? class {
     
     .bannerImg-2PzH6z, .bannerImage-ubW8K- {
         width: 100%;
-    }`;
+    }
+    
+    .chat-2ZfjoI, .container-2cd8Mz, .applicationStore-2nk7Lo {
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+    }
+    `;
+
 
     //Settings and imports
 	const { Settings } = { ...Library, ...BdApi };
@@ -86,15 +93,20 @@ module.exports = !global.ZeresPluginLibrary ? class {
 
     var settings = defaultSettings;
 
+    var channelListClass = '.sidebar-1tnWFu';
+    var friendsTabClass = '.container-2cd8Mz';
+    var nitroTabClass = '.applicationStore-2nk7Lo';
+    var chatContainerClass = '.chat-2ZfjoI';
+
     function GetResizeObjects() {
         // inline because closing/opening thread clears class list
-        const containerChat = document.getElementsByClassName("chat-2ZfjoI")[0];
-        const containerChannels = document.getElementsByClassName("container-2cd8Mz")[0];
+        const containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}`);
         if (containerChat) containerChat.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
+        const containerChannels = document.querySelector(friendsTabClass);
         if (containerChannels) containerChannels.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
 
-        const channelList = document.getElementsByClassName("sidebar-1tnWFu")[0];
-        if (document.getElementsByClassName("ResizableChannels-Slider-Handle").length == 0) addReziseHandleRight(channelList);
+        const channelList = document.querySelector(channelListClass);
+        if (!document.querySelector(".ResizableChannels-Slider-Handle")) addReziseHandleRight(channelList);
     }
 
     function addReziseHandleRight(target) {
@@ -162,20 +174,20 @@ module.exports = !global.ZeresPluginLibrary ? class {
         function RemoveStyle() {
             if (!style) return;
             style = false;
-            if(!containerChat) containerChat = document.getElementsByClassName("container-2cd8Mz")[0];
-            if(!containerChannels) containerChannels = document.getElementsByClassName("chat-2ZfjoI")[0];
-            if (containerChat) containerChat.style = "border-top-left-radius: 8px !important;";
+            containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}`);
+            containerChannels = document.querySelector(channelListClass);
+            if (containerChat) containerChat.style = "border-top-left-radius: 8px; border-bottom-left-radius: 0px;";
             if (containerChannels) containerChannels.removeAttribute("style");
         }
 
         function AddStyle() {
             if(style) return;
             style = true;
-            if(!containerChat) containerChat = document.getElementsByClassName("container-2cd8Mz")[0];
-            if(!containerChannels) containerChannels = document.getElementsByClassName("chat-2ZfjoI")[0];
-            handle.style.marginRight = "0px";
+            containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}`);
+            containerChannels = document.querySelector(channelListClass);
             if (containerChat) containerChat.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
             if (containerChannels) containerChannels.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
+            handle.style.marginRight = "0px";
         }
     }
 
@@ -196,7 +208,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
             testButton.addEventListener("click", () => {
                 settings = defaultSettings;
                 this.saveSettings(settings);
-                const settingsValues = settingsPannel.getElementsByClassName("inputDefault-3FGxgL");
+                const settingsValues = settingsPannel.querySelectorAll(".inputDefault-3FGxgL");
                 for(var e in settingsValues) settingsValues[e].value = settings[Object.keys(settings)[e]]
             });
 
@@ -219,14 +231,13 @@ module.exports = !global.ZeresPluginLibrary ? class {
         };
         onStop() {
             BdApi.clearCSS(config.info.name);
-            const containerChat = document.getElementsByClassName("container-2cd8Mz")[0];
+            const containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}`);
             if(containerChat) containerChat.removeAttribute("style");
-            const containerChatHome = document.getElementsByClassName("chat-2ZfjoI")[0];
+            const containerChatHome = document.querySelector(chatContainerClass);
             if(containerChatHome) containerChatHome.removeAttribute("style");
-            const handles = document.getElementsByClassName("ResizableChannels-Slider-Handle");
+            const handles = document.querySelectorAll(".ResizableChannels-Slider-Handle");
             for (const h of handles) { h.parentNode.removeChild(h) };
-            const channelList = document.getElementsByClassName("sidebar-1tnWFu");
-            for (const r of channelList) r.style.width = `${settings.defaultWidth}px`;
+            document.querySelector(channelListClass).style.width = `${settings.defaultWidth}px`;
         }
     }
 })(global.ZeresPluginLibrary.buildPlugin(config));
