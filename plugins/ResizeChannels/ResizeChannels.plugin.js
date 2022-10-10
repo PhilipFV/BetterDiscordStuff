@@ -4,7 +4,7 @@
  * @website https://github.philipv.tech/
  * @source https://github.com/PhilipFV/BetterDiscordStuff/
  * @updateUrl https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js
- * @version 0.1.9.1
+ * @version 0.1.11
  */
 
  const config = {
@@ -15,7 +15,7 @@
             "discord_id": "455031571930546177",
             "github_username": "PhilipFV"
         }],
-        "version": "0.1.9.1",
+        "version": "0.1.11",
         "description": "Resize channel list by clicking and draging and toggle hide with double click.",
         "github_raw": "https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js"
     },
@@ -49,7 +49,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
     }
 
     .sidebar-1tnWFu{
-        border-radius: 8px 8px 8px 0px !important;
+        margin-right: 0 !important;
     }
 
     .channel-1Shao0 {
@@ -63,6 +63,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
 
     .avatarWrapper-1B9FTW {
         margin-right: auto;
+        width: 100%;
     }
 
     .withTagAsButton-OsgQ9L {
@@ -72,23 +73,19 @@ module.exports = !global.ZeresPluginLibrary ? class {
     .bannerImg-2PzH6z, .bannerImage-ubW8K- {
         width: 100%;
     }
-    
-    .chat-2ZfjoI, .container-2cd8Mz, .applicationStore-2nk7Lo {
-        border-top-left-radius: 8px;
-        border-bottom-left-radius: 8px;
-    }
     `;
-
 
     //Settings and imports
 	const { Settings } = { ...Library, ...BdApi };
-	const { SettingPanel, SettingGroup, Textbox } = Settings;
+	const { SettingPanel, Switch, Textbox } = Settings;
 
 	//default settings
 	const defaultSettings = {
         defaultWidth: 240,
         maxWidth: 674,
         minWidth: 112,
+        roundBorders: true,
+        borderRadius: 8,
 	};
 
     var settings = defaultSettings;
@@ -101,11 +98,13 @@ module.exports = !global.ZeresPluginLibrary ? class {
     function GetResizeObjects() {
         // inline because closing/opening thread clears class list
         const containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}`);
-        if (containerChat) containerChat.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
-        const containerChannels = document.querySelector(friendsTabClass);
-        if (containerChannels) containerChannels.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
+        if (containerChat && settings.roundBorders) { containerChat.style.borderTopLeftRadius = `${settings.borderRadius}px`; containerChat.style.borderBottomLeftRadius = `${settings.borderRadius}px`;}
 
         const channelList = document.querySelector(channelListClass);
+        if(settings.roundBorders) {
+            channelList.style.borderTopRightRadius = `${settings.borderRadius}px`;
+            channelList.style.borderBottomRightRadius = `${settings.borderRadius}px`;
+        }
         if (!document.querySelector(".ResizableChannels-Slider-Handle")) addReziseHandleRight(channelList);
     }
 
@@ -128,11 +127,11 @@ module.exports = !global.ZeresPluginLibrary ? class {
             var newWidth = 0;
             if (target.style.width === "0px")
             {
-                handle.style.cursor = "ew-resize"
+                handle.style.cursor = "ew-resize";
                 newWidth = settings.defaultWidth;
                 AddStyle();
             } else {
-                handle.style.cursor = "e-resize"
+                handle.style.cursor = "e-resize";
                 handle.style.marginRight = "-8px";
                 RemoveStyle();
             }
@@ -145,10 +144,10 @@ module.exports = !global.ZeresPluginLibrary ? class {
                 document.removeEventListener("mousemove", resize, true);
                 return;
             }
-            var potentialWidth = e.clientX - target.getBoundingClientRect().left - offset;
+            var potentialWidth = e.clientX - target.getBoundingClientRect().left - offset; // mouse position
             var width = Math.min(Math.max(potentialWidth, settings.minWidth), settings.maxWidth);
             if (width <= settings.minWidth) {
-                if (potentialWidth <= settings.minWidth * 0.1){ // 10% of max width
+                if (potentialWidth <= settings.minWidth * 0.1) { // snap width to zero if the mouse is at less than 10% of the minimum width
                     width = 0;
                     handle.style.marginRight = "-8px";
                     RemoveStyle();
@@ -163,37 +162,54 @@ module.exports = !global.ZeresPluginLibrary ? class {
                 AddStyle()
             }
             target.style.width = `${width}px`;
-            if (width == 0) handle.style.cursor = "e-resize"
-            else if (width == settings.maxWidth) handle.style.cursor = "w-resize"
-            else handle.style.cursor = "ew-resize"
+            if (width == 0) handle.style.cursor = "e-resize";
+            else if (width == settings.maxWidth) handle.style.cursor = "w-resize";
+            else handle.style.cursor = "ew-resize";
         }
 
         var style = true;
-        var containerChat, containerChannels;
+        var containerChat;
 
         function RemoveStyle() {
             if (!style) return;
             style = false;
             containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}`);
-            containerChannels = document.querySelector(channelListClass);
-            if (containerChat) containerChat.style = "border-top-left-radius: 8px; border-bottom-left-radius: 0px;";
-            if (containerChannels) containerChannels.removeAttribute("style");
+            if (containerChat) containerChat.removeAttribute("style");
         }
 
         function AddStyle() {
             if(style) return;
             style = true;
-            containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}`);
-            containerChannels = document.querySelector(channelListClass);
-            if (containerChat) containerChat.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
-            if (containerChannels) containerChannels.style = "border-top-left-radius: 8px; border-bottom-left-radius: 8px;";
+            if(settings.roundBorders) {
+                containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}`);
+                if (containerChat) {
+                    containerChat.style.borderTopLeftRadius = `${settings.borderRadius}px`; containerChat.style.borderBottomLeftRadius = `${settings.borderRadius}px`;
+                }
+            }
             handle.style.marginRight = "0px";
         }
     }
 
+    function UpdateStyle() {
+        const containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}`);
+        const channelList = document.querySelector(channelListClass);
+        if (!containerChat) return;
+        if(settings.roundBorders) {
+            if (containerChat) {
+                containerChat.style.borderTopLeftRadius = `${settings.borderRadius}px`; containerChat.style.borderBottomLeftRadius = `${settings.borderRadius}px`
+            }
+            if (channelList) {
+                channelList.style.borderTopRightRadius = `${settings.borderRadius}px`;
+                channelList.style.borderBottomRightRadius = `${settings.borderRadius}px`;
+            }
+            return;
+        }
+        if (containerChat) containerChat.removeAttribute("style");
+        if (channelList) channelList.removeAttribute("style");
+    }
+
     return class template extends Plugin {
         onStart() {
-            //load default settings
 			settings = this.loadSettings(defaultSettings);
 
             BdApi.injectCSS(config.info.name, customCSS);
@@ -201,28 +217,38 @@ module.exports = !global.ZeresPluginLibrary ? class {
         }
         getSettingsPanel() {
 			//build the settings pannel
-            var testButton = document.createElement("button");
-            testButton.classList = "button-f2h6uQ lookFilled-yCfaCM colorBrand-I6CyqQ sizeMedium-2bFIHr";
-            testButton.style = "width: 100%"
-            testButton.innerText = "Reset Settings"
-            testButton.addEventListener("click", () => {
+            var resetValues = document.createElement("button");
+            resetValues.classList = "button-f2h6uQ lookFilled-yCfaCM colorBrand-I6CyqQ sizeMedium-2bFIHr .marginBottom20-315RVT";
+            resetValues.style = "width: 100%";
+            resetValues.innerText = "Default Settings";
+            resetValues.addEventListener("click", () => {
+                // Set default settings
                 settings = defaultSettings;
                 this.saveSettings(settings);
-                const settingsValues = settingsPannel.querySelectorAll(".inputDefault-3FGxgL");
-                for(var e in settingsValues) settingsValues[e].value = settings[Object.keys(settings)[e]]
+                UpdateStyle();
+                // Close settings panel (very ugly)
+                settingsPannel.parentNode.parentNode.parentNode.lastChild.lastChild.click()
             });
 
             const settingsPannel = SettingPanel.build(() => this.saveSettings(settings),
                 new Textbox("Default Width", "", settings.defaultWidth, (i) => {
-                    settings.defaultWidth = i.replace(/[^0-9]/g, '');
+                    settings.defaultWidth = parseInt(i.replace(/[^0-9]/g, '')) || defaultSettings.defaultWidth;
                 }),
                 new Textbox("Maximum Width", "", settings.maxWidth, (i) => {
-                    settings.maxWidth = i.replace(/[^0-9]/g, '');
+                    settings.maxWidth = parseInt(i.replace(/[^0-9]/g, '')) || defaultSettings.maxWidth;
                 }),
                 new Textbox("Minimum Width", "This option is intended to fix custom themes.", settings.minWidth, (i) => {
-                    settings.minWidth = i.replace(/[^0-9]/g, '');
+                    settings.minWidth = parseInt(i.replace(/[^0-9]/g, '')) || defaultSettings.minWidth;
                 }),
-                testButton,
+                new Switch( "Rounded Corners", "Disable this if you are using a theme that rounds the channel list and chat corners.", settings.roundBorders, (i) => {
+                    settings.roundBorders = i;
+                    UpdateStyle();
+                }),
+                new Textbox("Corner Radious", "How rounded the corners should be.", settings.borderRadius, (i) => {
+                    settings.borderRadius = parseInt(i.replace(/[^0-9]/g, '')) || defaultSettings.borderRadius;
+                    UpdateStyle();
+                }),
+                resetValues,
             );
 			return  settingsPannel;
 		}
@@ -231,12 +257,19 @@ module.exports = !global.ZeresPluginLibrary ? class {
         };
         onStop() {
             BdApi.clearCSS(config.info.name);
+
             const containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}`);
-            if(containerChat) containerChat.removeAttribute("style");
+            if(containerChat) {
+                containerChat.style.removeProperty("border-top-left-radius"); containerChat.style.removeProperty("border-bottom-left-radius");
+            }
             const containerChatHome = document.querySelector(chatContainerClass);
-            if(containerChatHome) containerChatHome.removeAttribute("style");
+            if(containerChatHome) {
+                containerChatHome.style.removeProperty("border-top-left-radius"); containerChatHome.style.removeProperty("border-bottom-left-radius");
+            }
             const handles = document.querySelectorAll(".ResizableChannels-Slider-Handle");
-            for (const h of handles) { h.parentNode.removeChild(h) };
+            for (const h of handles) {
+                h.parentNode.removeChild(h)
+            };
             document.querySelector(channelListClass).style.width = `${settings.defaultWidth}px`;
         }
     }
