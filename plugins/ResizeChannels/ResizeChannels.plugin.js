@@ -4,7 +4,7 @@
  * @website https://github.philipv.tech/
  * @source https://github.com/PhilipFV/BetterDiscordStuff/
  * @updateUrl https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js
- * @version 1.0.0
+ * @version 1.0.1
  */
 
  const config = {
@@ -15,7 +15,7 @@
             "discord_id": "455031571930546177",
             "github_username": "PhilipFV"
         }],
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "Resize channel list by clicking and draging and toggle hide with double click.",
         "github_raw": "https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js"
     },
@@ -49,6 +49,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
     }
 
     .sidebar-1tnWFu{
+        overflow: hidden;
         margin-right: 0 !important;
     }
 
@@ -218,7 +219,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
         getSettingsPanel() {
 			//build the settings pannel
             var resetValues = document.createElement("button");
-            resetValues.classList = "button-f2h6uQ lookFilled-yCfaCM colorBrand-I6CyqQ sizeMedium-2bFIHr .marginBottom20-315RVT";
+            resetValues.classList = "bd-button button-ejjZWC lookFilled-1H2Jvj colorBrand-2M3O3N sizeMedium-2oH5mg grow-2T4nbg";
             resetValues.style = "width: 100%";
             resetValues.innerText = "Default Settings";
             resetValues.addEventListener("click", () => {
