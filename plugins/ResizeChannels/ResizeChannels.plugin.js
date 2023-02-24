@@ -4,7 +4,7 @@
  * @website https://github.philipv.tech/
  * @source https://github.com/PhilipFV/BetterDiscordStuff/
  * @updateUrl https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js
- * @version 1.0.1
+ * @version 1.0.2
  */
 
  const config = {
@@ -15,7 +15,7 @@
             "discord_id": "455031571930546177",
             "github_username": "PhilipFV"
         }],
-        "version": "1.0.1",
+        "version": "1.0.2",
         "description": "Resize channel list by clicking and draging and toggle hide with double click.",
         "github_raw": "https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js"
     },
@@ -73,6 +73,11 @@ module.exports = !global.ZeresPluginLibrary ? class {
     
     .bannerImg-2PzH6z, .bannerImage-ubW8K- {
         width: 100%;
+    }
+
+    /* Fix voice channel full screen */
+    .hidden-38rxp9 {
+        width: 0 !important;
     }
     `;
 
@@ -271,7 +276,12 @@ module.exports = !global.ZeresPluginLibrary ? class {
             for (const h of handles) {
                 h.parentNode.removeChild(h)
             };
-            document.querySelector(channelListClass).style.width = `${settings.defaultWidth}px`;
+            const channelList = document.querySelector(channelListClass);
+            if (channelList) {
+                channelList.style.removeProperty("width");
+                channelList.style.removeProperty("border-top-right-radius");
+                channelList.style.removeProperty("border-bottom-right-radius");
+            }
         }
     }
 })(global.ZeresPluginLibrary.buildPlugin(config));
