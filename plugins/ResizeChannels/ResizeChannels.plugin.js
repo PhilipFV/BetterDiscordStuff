@@ -4,18 +4,18 @@
  * @website https://github.philipv.tech/
  * @source https://github.com/PhilipFV/BetterDiscordStuff/
  * @updateUrl https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js
- * @version 1.0.2
+ * @version 1.0.3
  */
 
  const config = {
     "info": {
         "name": "ResizeChannels",
         "authors": [{
-            "name": "Güztaf",
+            "name": "guztaf",
             "discord_id": "455031571930546177",
             "github_username": "PhilipFV"
         }],
-        "version": "1.0.2",
+        "version": "1.0.3",
         "description": "Resize channel list by clicking and draging and toggle hide with double click.",
         "github_raw": "https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js"
     },
@@ -99,11 +99,12 @@ module.exports = !global.ZeresPluginLibrary ? class {
     var channelListClass = '.sidebar-1tnWFu';
     var friendsTabClass = '.container-2cd8Mz';
     var nitroTabClass = '.applicationStore-2nk7Lo';
+    var familyCenterTabClass = '.containerSidenav-3qiKqP';
     var chatContainerClass = '.chat-2ZfjoI';
 
     function GetResizeObjects() {
         // inline because closing/opening thread clears class list
-        const containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}`);
+        const containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}, ${familyCenterTabClass}`);
         if (containerChat && settings.roundBorders) { containerChat.style.borderTopLeftRadius = `${settings.borderRadius}px`; containerChat.style.borderBottomLeftRadius = `${settings.borderRadius}px`;}
 
         const channelList = document.querySelector(channelListClass);
