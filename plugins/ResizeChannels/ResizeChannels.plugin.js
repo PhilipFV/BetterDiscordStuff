@@ -4,7 +4,7 @@
  * @website https://github.philipv.tech/
  * @source https://github.com/PhilipFV/BetterDiscordStuff/
  * @updateUrl https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js
- * @version 1.0.3
+ * @version 1.1.3
  */
 
  const config = {
@@ -100,7 +100,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
     var friendsTabClass = '.container-2cd8Mz';
     var nitroTabClass = '.applicationStore-2nk7Lo';
     var familyCenterTabClass = '.containerSidenav-3qiKqP';
-    var chatContainerClass = '.chat-2ZfjoI';
+    var chatContainerClass = '.chat-9g_3Xj';
 
     function GetResizeObjects() {
         // inline because closing/opening thread clears class list
@@ -119,7 +119,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
         target.style.width = `${settings.defaultWidth}px`;
         var handle = document.createElement("div");
         handle.classList.add("ResizableChannels-Slider-Handle");
-        handle.classList.add("resizeHandle-PBRzPC");
+        handle.classList.add("resizeHandle-2F4Beb"); // Discord styling for resize bars
         // target.appendChild(handle);
         target.after(handle);
         var offset = 0;
