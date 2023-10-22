@@ -15,7 +15,7 @@
             "discord_id": "455031571930546177",
             "github_username": "PhilipFV"
         }],
-        "version": "1.0.3",
+        "version": "1.1.3",
         "description": "Resize channel list by clicking and draging and toggle hide with double click.",
         "github_raw": "https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js"
     },
