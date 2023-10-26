@@ -4,7 +4,7 @@
  * @website https://github.philipv.tech/
  * @source https://github.com/PhilipFV/BetterDiscordStuff/
  * @updateUrl https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js
- * @version 1.1.3
+ * @version 1.1.4
  */
 
  const config = {
@@ -15,7 +15,7 @@
             "discord_id": "455031571930546177",
             "github_username": "PhilipFV"
         }],
-        "version": "1.1.3",
+        "version": "1.1.4",
         "description": "Resize channel list by clicking and draging and toggle hide with double click.",
         "github_raw": "https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js"
     },
@@ -45,39 +45,56 @@ module.exports = !global.ZeresPluginLibrary ? class {
     const customCSS = `
     .ResizableChannels-Slider-Handle {
         cursor: ew-resize;
-        z-index: 1001;
+        /*z-index: 1001; */
     }
 
-    .sidebar-1tnWFu{
+    /* Channel list */
+    .sidebar_ded4b5{
         overflow: hidden;
         margin-right: 0 !important;
     }
 
-    .channel-1Shao0 {
+    /* I don't remember */
+    .container__590e2 {
         max-width: none;
     }
 
-    .container-YkUktl .flex-2S1XBF {
+    /* Mute/Deafen/Settings buttons n stuff */
+    .container-YkUktl .flex_f5fbb7 {
         background-color: var(--background-secondary-alt);
         z-index: 0;
     }
 
-    .avatarWrapper-1B9FTW {
+    /* Buttons that show up when you join VC */
+    .actionButtons_b58cbb button{
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    /* User avatar in the bottom left corner */
+    .avatarWrapper_ba5175 {
         margin-right: auto;
         width: 100%;
     }
 
-    .withTagAsButton-OsgQ9L {
+    /* Another class for the avatar that sets a minimum width */
+    .withTagAsButton_cc125f {
         min-width: 0;
     }
     
-    .bannerImg-2PzH6z, .bannerImage-ubW8K- {
+    /* Server banner image */
+    .bannerImg_c85b7f {
         width: 100%;
     }
 
     /* Fix voice channel full screen */
-    .hidden-38rxp9 {
+    .hidden__3ab58 {
         width: 0 !important;
+    }
+
+    .hidden__3ab58 + .ResizableChannels-Slider-Handle {
+        width: 0;
+        visibility: hidden;
     }
     `;
 
@@ -96,15 +113,15 @@ module.exports = !global.ZeresPluginLibrary ? class {
 
     var settings = defaultSettings;
 
-    var channelListClass = '.sidebar-1tnWFu';
-    var friendsTabClass = '.container-2cd8Mz';
-    var nitroTabClass = '.applicationStore-2nk7Lo';
-    var familyCenterTabClass = '.containerSidenav-3qiKqP';
-    var chatContainerClass = '.chat-9g_3Xj';
+    var channelListClass = '.sidebar_ded4b5';
+    var friendsTabClass = '.container__5c7e7';
+    var nitroTabClass = '.applicationStore_fc7d76';
+    var shopTabClass = '.shop_b31ed2';
+    var chatContainerClass = '.chat__52833';
 
     function GetResizeObjects() {
         // inline because closing/opening thread clears class list
-        const containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}, ${familyCenterTabClass}`);
+        const containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}, ${shopTabClass}`);
         if (containerChat && settings.roundBorders) { containerChat.style.borderTopLeftRadius = `${settings.borderRadius}px`; containerChat.style.borderBottomLeftRadius = `${settings.borderRadius}px`;}
 
         const channelList = document.querySelector(channelListClass);
@@ -119,7 +136,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
         target.style.width = `${settings.defaultWidth}px`;
         var handle = document.createElement("div");
         handle.classList.add("ResizableChannels-Slider-Handle");
-        handle.classList.add("resizeHandle-2F4Beb"); // Discord styling for resize bars
+        handle.classList.add("resizeHandle_f1a098"); // Discord styling for resize bars
         // target.appendChild(handle);
         target.after(handle);
         var offset = 0;
@@ -139,7 +156,8 @@ module.exports = !global.ZeresPluginLibrary ? class {
                 AddStyle();
             } else {
                 handle.style.cursor = "e-resize";
-                handle.style.marginRight = "-8px";
+                handle.style.marginRight = `-${Math.ceil(handle.getBoundingClientRect().width)}px`;;
+                handle.style.backgroundColor = "transparent";
                 RemoveStyle();
             }
             target.style.width = `${newWidth}px`;
@@ -156,7 +174,8 @@ module.exports = !global.ZeresPluginLibrary ? class {
             if (width <= settings.minWidth) {
                 if (potentialWidth <= settings.minWidth * 0.1) { // snap width to zero if the mouse is at less than 10% of the minimum width
                     width = 0;
-                    handle.style.marginRight = "-8px";
+                    handle.style.marginRight = `-${Math.ceil(handle.getBoundingClientRect().width)}px`;
+                    handle.style.backgroundColor = "transparent";
                     RemoveStyle();
                 } else {
                     handle.style.marginRight = "0";
@@ -166,7 +185,8 @@ module.exports = !global.ZeresPluginLibrary ? class {
             }
             else {
                 handle.style.marginRight = "0";
-                AddStyle()
+                handle.style.backgroundColor = "";
+                AddStyle();
             }
             target.style.width = `${width}px`;
             if (width == 0) handle.style.cursor = "e-resize";
@@ -225,7 +245,8 @@ module.exports = !global.ZeresPluginLibrary ? class {
         getSettingsPanel() {
 			//build the settings pannel
             var resetValues = document.createElement("button");
-            resetValues.classList = "bd-button button-ejjZWC lookFilled-1H2Jvj colorBrand-2M3O3N sizeMedium-2oH5mg grow-2T4nbg";
+            // resetValues.classList = "bd-button button-ejjZWC lookFilled-1H2Jvj colorBrand-2M3O3N sizeMedium-2oH5mg grow-2T4nbg";
+            resetValues.classList = "bd-button";
             resetValues.style = "width: 100%";
             resetValues.innerText = "Default Settings";
             resetValues.addEventListener("click", () => {
