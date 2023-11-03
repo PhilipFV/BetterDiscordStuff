@@ -4,7 +4,7 @@
  * @website https://github.philipv.tech/
  * @source https://github.com/PhilipFV/BetterDiscordStuff/
  * @updateUrl https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js
- * @version 1.1.5
+ * @version 1.1.6
  */
 
  const config = {
@@ -15,7 +15,7 @@
             "discord_id": "455031571930546177",
             "github_username": "PhilipFV"
         }],
-        "version": "1.1.5",
+        "version": "1.1.6",
         "description": "Resize channel list by clicking and draging and toggle hide with double click.",
         "github_raw": "https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js"
     },
@@ -119,12 +119,14 @@ module.exports = !global.ZeresPluginLibrary ? class {
     var shopTabClass = '.shop_b31ed2';
     var chatContainerClass = '.chat__52833';
 
+    var containers = `${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}, ${shopTabClass}`;
+
     function GetResizeObjects() {
         // inline because closing/opening thread clears class list
-        const containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}, ${shopTabClass}`);
-        if (containerChat && settings.roundBorders) { containerChat.style.borderTopLeftRadius = `${settings.borderRadius}px`; containerChat.style.borderBottomLeftRadius = `${settings.borderRadius}px`;}
-
+        const containerChat = document.querySelector(containers);
         const channelList = document.querySelector(channelListClass);
+        
+        if (containerChat && settings.roundBorders && channelList.style.width !== "0px") { containerChat.style.borderTopLeftRadius = `${settings.borderRadius}px`; containerChat.style.borderBottomLeftRadius = `${settings.borderRadius}px`;}
         if(settings.roundBorders) {
             channelList.style.borderTopRightRadius = `${settings.borderRadius}px`;
             channelList.style.borderBottomRightRadius = `${settings.borderRadius}px`;
@@ -153,6 +155,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
             {
                 handle.style.cursor = "ew-resize";
                 newWidth = settings.defaultWidth;
+                handle.style.backgroundColor = "";
                 AddStyle();
             } else {
                 handle.style.cursor = "e-resize";
@@ -180,6 +183,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
                 } else {
                     handle.style.marginRight = "0";
                     width = settings.minWidth;
+                    handle.style.backgroundColor = "";
                     AddStyle();
                 }
             }
@@ -200,7 +204,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
         function RemoveStyle() {
             if (!style) return;
             style = false;
-            containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}`);
+            containerChat = document.querySelector(containers);
             if (containerChat) containerChat.removeAttribute("style");
         }
 
@@ -208,7 +212,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
             if(style) return;
             style = true;
             if(settings.roundBorders) {
-                containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}`);
+                containerChat = document.querySelector(containers);
                 if (containerChat) {
                     containerChat.style.borderTopLeftRadius = `${settings.borderRadius}px`; containerChat.style.borderBottomLeftRadius = `${settings.borderRadius}px`;
                 }
@@ -218,7 +222,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
     }
 
     function UpdateStyle() {
-        const containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}`);
+        const containerChat = document.querySelector(containers);
         const channelList = document.querySelector(channelListClass);
         if (!containerChat) return;
         if(settings.roundBorders) {
@@ -286,7 +290,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
         onStop() {
             BdApi.clearCSS(config.info.name);
 
-            const containerChat = document.querySelector(`${chatContainerClass}, ${friendsTabClass}, ${nitroTabClass}`);
+            const containerChat = document.querySelector(containers);
             if(containerChat) {
                 containerChat.style.removeProperty("border-top-left-radius"); containerChat.style.removeProperty("border-bottom-left-radius");
             }
