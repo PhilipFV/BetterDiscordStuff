@@ -4,7 +4,7 @@
  * @website https://github.philipv.tech/
  * @source https://github.com/PhilipFV/BetterDiscordStuff/
  * @updateUrl https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js
- * @version 1.1.4
+ * @version 1.1.5
  */
 
  const config = {
@@ -15,7 +15,7 @@
             "discord_id": "455031571930546177",
             "github_username": "PhilipFV"
         }],
-        "version": "1.1.4",
+        "version": "1.1.5",
         "description": "Resize channel list by clicking and draging and toggle hide with double click.",
         "github_raw": "https://raw.githubusercontent.com/PhilipFV/BetterDiscordStuff/main/plugins/ResizeChannels/ResizeChannels.plugin.js"
     },
@@ -45,7 +45,7 @@ module.exports = !global.ZeresPluginLibrary ? class {
     const customCSS = `
     .ResizableChannels-Slider-Handle {
         cursor: ew-resize;
-        /*z-index: 1001; */
+        z-index: 1001;
     }
 
     /* Channel list */
